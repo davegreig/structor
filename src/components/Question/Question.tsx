@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import './Question.css';
 
 import {
@@ -10,15 +10,15 @@ import {
     ValueSet,
     ValueSetComposeIncludeConcept,
 } from '../../types/fhir';
-import { IExtentionType, IItemProperty, IQuestionnaireItemType } from '../../types/IQuestionnareItemType';
+import {IExtentionType, IItemProperty, IQuestionnaireItemType} from '../../types/IQuestionnareItemType';
 
-import { updateItemAction } from '../../store/treeStore/treeActions';
-import { isRecipientList } from '../../helpers/QuestionHelper';
-import { createMarkdownExtension, removeItemExtension, setItemExtension } from '../../helpers/extensionHelper';
-import { isItemControlInline, isItemControlReceiverComponent, isItemControlHighlight } from '../../helpers/itemControl';
+import {updateItemAction} from '../../store/treeStore/treeActions';
+import {isRecipientList} from '../../helpers/QuestionHelper';
+import {createMarkdownExtension, removeItemExtension, setItemExtension} from '../../helpers/extensionHelper';
+import {isItemControlHighlight, isItemControlInline, isItemControlReceiverComponent} from '../../helpers/itemControl';
 
 import Accordion from '../Accordion/Accordion';
-import { ActionType } from '../../store/treeStore/treeStore';
+import {ActionType} from '../../store/treeStore/treeStore';
 import AdvancedQuestionOptions from '../AdvancedQuestionOptions/AdvancedQuestionOptions';
 import Choice from './QuestionType/Choice';
 import EnableWhen from '../EnableWhen/EnableWhen';
@@ -31,15 +31,16 @@ import Codes from '../AdvancedQuestionOptions/Code/Codes';
 import OptionReference from './QuestionType/OptionReference';
 import FormField from '../FormField/FormField';
 import UnitTypeSelector from './UnitType/UnitTypeSelector';
-import { DateType } from './QuestionType/DateType';
-import { ValidationErrors } from '../../helpers/orphanValidation';
+import {DateType} from './QuestionType/DateType';
+import {ValidationErrors} from '../../helpers/orphanValidation';
 import {
     canTypeBeRequired,
     canTypeBeValidated,
     canTypeHaveSublabel,
     getItemDisplayType,
 } from '../../helpers/questionTypeFeatures';
-import { erRenderingOption } from '../../helpers/codeHelper';
+import {erRenderingOption} from '../../helpers/codeHelper';
+import DiffiaExtensions from "../AdvancedQuestionOptions/DiffiaExtensions/DiffiaExtensions";
 
 interface QuestionProps {
     item: QuestionnaireItem;
@@ -53,7 +54,7 @@ interface QuestionProps {
 }
 
 const Question = (props: QuestionProps): JSX.Element => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const [isMarkdownActivated, setIsMarkdownActivated] = React.useState<boolean>(!!props.item._text);
     const codeElements = props.item.code
         ? `(${props.item.code.filter((value) => !erRenderingOption(value)).length})`
@@ -106,22 +107,22 @@ const Question = (props: QuestionProps): JSX.Element => {
             isItemControlHighlight(props.item) ||
             props.item.type === IQuestionnaireItemType.display
         ) {
-            return <Infotext item={props.item} parentArray={props.parentArray} />;
+            return <Infotext item={props.item} parentArray={props.parentArray}/>;
         }
         if (isRecipientList(props.item)) {
-            return <OptionReference item={props.item} />;
+            return <OptionReference item={props.item}/>;
         }
         if (props.item.type === IQuestionnaireItemType.date || props.item.type === IQuestionnaireItemType.dateTime) {
-            return <DateType item={props.item} dispatch={props.dispatch} />;
+            return <DateType item={props.item} dispatch={props.dispatch}/>;
         }
         if (
             props.item.type === IQuestionnaireItemType.choice ||
             props.item.type === IQuestionnaireItemType.openChoice
         ) {
-            return <Choice item={props.item} />;
+            return <Choice item={props.item}/>;
         }
         if (props.item.type === IQuestionnaireItemType.quantity) {
-            return <UnitTypeSelector item={props.item} />;
+            return <UnitTypeSelector item={props.item}/>;
         }
         if (props.item.type === IQuestionnaireItemType.string || props.item.type === IQuestionnaireItemType.text) {
             return (
@@ -180,7 +181,7 @@ const Question = (props: QuestionProps): JSX.Element => {
                 </div>
                 <FormField label={t('Text')}>
                     {isMarkdownActivated ? (
-                        <MarkdownEditor data={getLabelText()} onBlur={dispatchUpdateMarkdownLabel} />
+                        <MarkdownEditor data={getLabelText()} onBlur={dispatchUpdateMarkdownLabel}/>
                     ) : (
                         <textarea
                             defaultValue={getLabelText()}
@@ -211,11 +212,15 @@ const Question = (props: QuestionProps): JSX.Element => {
                 {respondType()}
             </div>
             <div className="question-addons">
+                <Accordion title={"Diffia Extension"}>
+                    <DiffiaExtensions linkId={props.item.linkId} itemValidationErrors={props.itemValidationErrors}/>
+                </Accordion>
                 {canTypeBeValidated(props.item) && (
                     <Accordion title={t('Add validation')}>
-                        <ValidationAnswerTypes item={props.item} />
+                        <ValidationAnswerTypes item={props.item}/>
                     </Accordion>
                 )}
+
                 <Accordion title={`${t('Enable when')} ${enableWhenCount}`}>
                     <EnableWhen
                         getItem={props.getItem}
@@ -227,7 +232,7 @@ const Question = (props: QuestionProps): JSX.Element => {
                     />
                 </Accordion>
                 <Accordion title={`${t('Code')} ${codeElements}`}>
-                    <Codes linkId={props.item.linkId} itemValidationErrors={props.itemValidationErrors} />
+                    <Codes linkId={props.item.linkId} itemValidationErrors={props.itemValidationErrors}/>
                 </Accordion>
                 <Accordion title={t('Advanced settings')}>
                     <AdvancedQuestionOptions

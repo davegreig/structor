@@ -1,6 +1,6 @@
 import CreateUUID from '../../helpers/CreateUUID';
 import {
-    ICodingProperty,
+    ICodingProperty, ICustomExtensionProperty,
     IEnableWhen,
     IExtentionType,
     IItemProperty,
@@ -25,9 +25,12 @@ import { createItemControlExtension, ItemControlType } from '../../helpers/itemC
 import { createMarkdownExtension } from '../../helpers/extensionHelper';
 
 export const ADD_ITEM_CODE_ACTION = 'addItemCode';
+export const ADD_ITEM_CUSTOM_EXTENSION_ACTION = 'addItemCustomExtension';
 export const ADD_QUESTIONNAIRE_LANGUAGE_ACTION = 'addQuestionnaireLanguage';
 export const DELETE_ITEM_CODE_ACTION = 'deleteItemCode';
+export const DELETE_ITEM_CUSTOM_EXTENSION_ACTION = 'deleteItemCustomExtension';
 export const UPDATE_ITEM_CODE_PROPERTY_ACTION = 'updateItemCodeProperty';
+export const UPDATE_ITEM_CUSTOM_EXTENSION_PROPERTY_ACTION = 'updateItemCustomExtensionProperty';
 export const REMOVE_QUESTIONNAIRE_LANGUAGE_ACTION = 'removeQuestionnaireLanguage';
 export const UPDATE_ITEM_TRANSLATION_ACTION = 'updateItemTranslation';
 export const UPDATE_ITEM_OPTION_TRANSLATION_ACTION = 'updateItemOptionTranslation';
@@ -71,17 +74,36 @@ export interface AddItemCodeAction {
     code: Coding;
 }
 
+export interface AddItemCustomExtensionAction {
+    type: typeof ADD_ITEM_CUSTOM_EXTENSION_ACTION;
+    linkId: string;
+    extension: Extension;
+}
+
 export interface DeleteItemCodeAction {
     type: typeof DELETE_ITEM_CODE_ACTION;
     linkId: string;
     index: number;
 }
 
+export interface DeleteItemCustomExtensionAction {
+    type: typeof DELETE_ITEM_CUSTOM_EXTENSION_ACTION;
+    linkId: string;
+    index: number;
+}
 export interface UpdateItemCodePropertyAction {
     type: typeof UPDATE_ITEM_CODE_PROPERTY_ACTION;
     linkId: string;
     index: number;
     property: ICodingProperty;
+    value: string;
+}
+
+export interface UpdateItemCustomExtensionPropertyAction {
+    type: typeof UPDATE_ITEM_CUSTOM_EXTENSION_PROPERTY_ACTION;
+    linkId: string;
+    index: number;
+    property: ICustomExtensionProperty;
     value: string;
 }
 
@@ -247,9 +269,24 @@ export const addItemCodeAction = (linkId: string, code: Coding): AddItemCodeActi
     };
 };
 
+export const addItemCustomExtensionAction = (linkId: string, extension: Extension): AddItemCustomExtensionAction => {
+    return {
+        type: ADD_ITEM_CUSTOM_EXTENSION_ACTION,
+        linkId,
+        extension,
+    };
+};
 export const deleteItemCodeAction = (linkId: string, index: number): DeleteItemCodeAction => {
     return {
         type: DELETE_ITEM_CODE_ACTION,
+        linkId,
+        index,
+    };
+};
+
+export const deleteItemCustomExtensionAction = (linkId: string, index: number): DeleteItemCustomExtensionAction => {
+    return {
+        type: DELETE_ITEM_CUSTOM_EXTENSION_ACTION,
         linkId,
         index,
     };
@@ -263,6 +300,21 @@ export const updateItemCodePropertyAction = (
 ): UpdateItemCodePropertyAction => {
     return {
         type: UPDATE_ITEM_CODE_PROPERTY_ACTION,
+        linkId,
+        index,
+        property,
+        value,
+    };
+};
+
+export const updateItemCustomExtensionPropertyAction = (
+    linkId: string,
+    index: number,
+    property: ICustomExtensionProperty,
+    value: string,
+): UpdateItemCustomExtensionPropertyAction => {
+    return {
+        type: UPDATE_ITEM_CUSTOM_EXTENSION_PROPERTY_ACTION,
         linkId,
         index,
         property,

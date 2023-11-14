@@ -32,6 +32,11 @@ export enum ICodingProperty {
     system = 'system',
 }
 
+export enum ICustomExtensionProperty {
+    url = 'url',
+    valueString = 'valueString',
+}
+
 export enum IItemProperty {
     answerOption = 'answerOption',
     answerValueSet = 'answerValueSet',

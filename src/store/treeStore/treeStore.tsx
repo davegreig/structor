@@ -55,6 +55,11 @@ import {
     UpdateValueSetAction,
     UPDATE_SETTING_TRANSLATION_ACTION,
     UpdateSettingTranslationAction,
+    UpdateItemCustomExtensionPropertyAction,
+    AddItemCustomExtensionAction,
+    UPDATE_ITEM_CUSTOM_EXTENSION_PROPERTY_ACTION,
+    ADD_ITEM_CUSTOM_EXTENSION_ACTION,
+    DELETE_ITEM_CUSTOM_EXTENSION_ACTION, DeleteItemCustomExtensionAction,
 } from './treeActions';
 import { IQuestionnaireMetadata, IQuestionnaireMetadataType } from '../../types/IQuestionnaireMetadataType';
 import createUUID from '../../helpers/CreateUUID';
@@ -71,11 +76,14 @@ import { tjenesteomraadeCode, getTjenesteomraadeCoding } from '../../helpers/Met
 
 export type ActionType =
     | AddItemCodeAction
+    | AddItemCustomExtensionAction
     | AddQuestionnaireLanguageAction
     | DeleteItemCodeAction
+    | DeleteItemCustomExtensionAction
     | ImportValueSetAction
     | RemoveQuestionnaireLanguageAction
     | UpdateItemCodePropertyAction
+    | UpdateItemCustomExtensionPropertyAction
     | UpdateItemTranslationAction
     | UpdateItemOptionTranslationAction
     | ResetQuestionnaireAction
@@ -425,6 +433,17 @@ function addItemCode(draft: TreeState, action: AddItemCodeAction): void {
     draft.qItems[action.linkId].code?.push(action.code);
 }
 
+function addItemCustomExtension(draft: TreeState, action: AddItemCustomExtensionAction): void {
+    if (!draft.qItems[action.linkId]) {
+        console.error('Trying to add "extention" to non-extistent item');
+        return;
+    }
+    if (!draft.qItems[action.linkId].extension) {
+        draft.qItems[action.linkId].extension = [];
+    }
+    draft.qItems[action.linkId].extension?.push(action.extension);
+}
+
 function deleteItemCode(draft: TreeState, action: DeleteItemCodeAction): void {
     if (!draft.qItems[action.linkId]) {
         console.error('Trying to delete "code" from non-extistent item');
@@ -438,6 +457,19 @@ function deleteItemCode(draft: TreeState, action: DeleteItemCodeAction): void {
     }
 }
 
+function deleteItemCustomExtension(draft: TreeState, action: DeleteItemCustomExtensionAction): void {
+    if (!draft.qItems[action.linkId]) {
+        console.error('Trying to delete "extension" from non-extistent item');
+        return;
+    }
+    const { extension } = draft.qItems[action.linkId];
+    if (extension && extension.length > 1) {
+        draft.qItems[action.linkId].extension?.splice(action.index, 1);
+    } else {
+        delete draft.qItems[action.linkId].extension;
+    }
+}
+
 function updateItemCodeProperty(draft: TreeState, action: UpdateItemCodePropertyAction): void {
     const code = draft.qItems[action.linkId].code;
     if (!code) {
@@ -447,6 +479,18 @@ function updateItemCodeProperty(draft: TreeState, action: UpdateItemCodeProperty
 
     if (code && code[action.index]) {
         code[action.index][action.property] = action.value;
+    }
+}
+
+function updateItemCustomExtensionProperty(draft: TreeState, action: UpdateItemCustomExtensionPropertyAction): void {
+    const extension = draft.qItems[action.linkId].extension;
+    if (!extension) {
+        console.error('Trying to update "extension" from non-extistent item');
+        return;
+    }
+
+    if (extension && extension[action.index]) {
+        extension[action.index][action.property] = action.value;
     }
 }
 
@@ -678,11 +722,20 @@ const reducer = produce((draft: TreeState, action: ActionType) => {
         case ADD_ITEM_CODE_ACTION:
             addItemCode(draft, action);
             break;
+        case ADD_ITEM_CUSTOM_EXTENSION_ACTION:
+            addItemCustomExtension(draft, action);
+            break;
         case DELETE_ITEM_CODE_ACTION:
             deleteItemCode(draft, action);
             break;
+        case DELETE_ITEM_CUSTOM_EXTENSION_ACTION:
+            deleteItemCustomExtension(draft, action);
+            break;
         case UPDATE_ITEM_CODE_PROPERTY_ACTION:
             updateItemCodeProperty(draft, action);
+            break;
+        case UPDATE_ITEM_CUSTOM_EXTENSION_PROPERTY_ACTION:
+            updateItemCustomExtensionProperty(draft, action);
             break;
         case ADD_QUESTIONNAIRE_LANGUAGE_ACTION:
             addLanguage(draft, action);
